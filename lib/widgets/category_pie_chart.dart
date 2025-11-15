@@ -52,7 +52,7 @@ class CategoryPieChart extends StatelessWidget {
         // The Pie Chart
         // flex: 2 means it takes up 40% of the width
         Expanded(
-          flex: 3, 
+          flex: 2, // <-- THE FIX IS HERE (Was 3 in your code)
           child: PieChart(
             PieChartData(
               sections: sections,
@@ -66,7 +66,7 @@ class CategoryPieChart extends StatelessWidget {
         // The Legend
         // flex: 3 means it takes up 60% of the width (More space for text!)
         Expanded(
-          flex: 1, 
+          flex: 3, // <-- THE FIX IS HERE (Was 1 in your code)
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
