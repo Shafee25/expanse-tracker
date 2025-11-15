@@ -64,7 +64,7 @@ class CategoryPieChart extends StatelessWidget {
         const SizedBox(width: 16), // <-- FIX 3: Added spacing
         // The Legend
         Expanded(
-          flex: 2, // <-- FIX 4: Changed flex (was 1)
+          flex: 4, // <-- FIX 4: Changed flex (was 1)
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
