@@ -37,7 +37,7 @@ class CategoryPieChart extends StatelessWidget {
         color: color,
         value: entry.value,
         title: '${percentage.toStringAsFixed(0)}%',
-        radius: 70, // <-- FIX 1: Made radius smaller (was 80)
+        radius: 70, // Kept the smaller radius to fit better
         titleStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
@@ -50,8 +50,9 @@ class CategoryPieChart extends StatelessWidget {
     return Row(
       children: [
         // The Pie Chart
+        // flex: 2 means it takes up 40% of the width
         Expanded(
-          flex: 3, // <-- FIX 2: Changed flex (was 2)
+          flex: 3, 
           child: PieChart(
             PieChartData(
               sections: sections,
@@ -61,10 +62,11 @@ class CategoryPieChart extends StatelessWidget {
           ),
         ),
         // Add some space
-        const SizedBox(width: 16), // <-- FIX 3: Added spacing
+        const SizedBox(width: 16),
         // The Legend
+        // flex: 3 means it takes up 60% of the width (More space for text!)
         Expanded(
-          flex: 1, // <-- FIX 4: Changed flex (was 1)
+          flex: 1, 
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
