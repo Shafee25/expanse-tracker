@@ -110,6 +110,13 @@ class HiveDatabase extends ChangeNotifier {
     return summary;
   }
 
+  // --- CONSTRUCTOR ---
+  // Add this block of code.
+  // This code will run automatically ONE time when HiveDatabase is created.
+  HiveDatabase() {
+    loadTransactions();
+  }
+
   // --- Public Methods (CRUD) ---
 
   // Call this when the app starts
