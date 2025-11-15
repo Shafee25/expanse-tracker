@@ -1,3 +1,5 @@
+// lib/widgets/category_pie_chart.dart
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -6,106 +8,99 @@ class CategoryPieChart extends StatelessWidget {
 
   const CategoryPieChart({super.key, required this.distribution});
 
-  // Simple function to generate colors for the chart
   List<Color> _generateColors(int count) {
     final baseColors = [
-      Colors.blue.shade400,
-      Colors.green.shade400,
-      Colors.orange.shade400,
-      Colors.red.shade400,
-      Colors.purple.shade400,
-      Colors.yellow.shade600,
-      Colors.teal.shade400,
+      Colors.green.shade300, Colors.blue.shade300, Colors.orange.shade300,
+      Colors.red.shade300, Colors.purple.shade300, Colors.teal.shade300,
+      Colors.pink.shade200, Colors.amber.shade500,
     ];
-    List<Color> colors = [];
-    for (int i = 0; i < count; i++) {
-      colors.add(baseColors[i % baseColors.length]);
-    }
-    return colors;
+    return List.generate(count, (i) => baseColors[i % baseColors.length]);
   }
 
   @override
   Widget build(BuildContext context) {
-    final total = distribution.values.fold(0.0, (sum, item) => sum + item);
-    final colors = _generateColors(distribution.length);
-    int colorIndex = 0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 380) return _buildVerticalLayout();
+        else return _buildHorizontalLayout();
+      },
+    );
+  }
 
-    final List<PieChartSectionData> sections = distribution.entries.map((entry) {
-      final percentage = (entry.value / total) * 100;
-      final color = colors[colorIndex++];
-      return PieChartSectionData(
-        color: color,
-        value: entry.value,
-        title: '${percentage.toStringAsFixed(0)}%',
-        radius: 70, // Kept the smaller radius to fit better
-        titleStyle: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-          shadows: [Shadow(color: Colors.black, blurRadius: 1)],
-        ),
-      );
-    }).toList();
+  Widget _buildHorizontalLayout() {
+    return IntrinsicHeight(
+      child: Row(
+        children: [
+          Expanded(flex: 3, child: _buildChart()),
+          const SizedBox(width: 20),
+          Expanded(flex: 2, child: _buildLegend()),
+        ],
+      ),
+    );
+  }
 
-    return Row(
+  Widget _buildVerticalLayout() {
+    return Column(
       children: [
-        // The Pie Chart
-        // flex: 2 means it takes up 40% of the width
-        Expanded(
-          flex: 2, // <-- THE FIX IS HERE (Was 3 in your code)
-          child: PieChart(
-            PieChartData(
-              sections: sections,
-              centerSpaceRadius: 40,
-              sectionsSpace: 2,
-            ),
-          ),
-        ),
-        // Add some space
-        const SizedBox(width: 16),
-        // The Legend
-        // flex: 3 means it takes up 60% of the width (More space for text!)
-        Expanded(
-          flex: 3, // <-- THE FIX IS HERE (Was 1 in your code)
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: List.generate(distribution.length, (index) {
-              return _buildLegendItem(
-                colors[index],
-                distribution.keys.elementAt(index),
-              );
-            }),
-          ),
-        ),
+        SizedBox(height: 180, child: _buildChart()),
+        const SizedBox(height: 24),
+        _buildLegend(),
       ],
     );
   }
 
-  Widget _buildLegendItem(Color color, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Container(
-            width: 14,
-            height: 14,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(fontSize: 12),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+  Widget _buildChart() {
+    final total = distribution.values.fold(0.0, (sum, item) => sum + item);
+    final sortedEntries = distribution.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final colors = _generateColors(sortedEntries.length);
+
+    return PieChart(
+      PieChartData(
+        sections: List.generate(sortedEntries.length, (index) {
+          final entry = sortedEntries[index];
+          final percentage = (entry.value / total) * 100;
+          return PieChartSectionData(
+            color: colors[index],
+            value: entry.value,
+            title: percentage > 7 ? '${percentage.toStringAsFixed(0)}%' : '',
+            radius: 70,
+            titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54, shadows: [Shadow(color: Colors.white, blurRadius: 2)]),
+          );
+        }),
+        centerSpaceRadius: 40,
+        sectionsSpace: 2,
       ),
+    );
+  }
+
+  Widget _buildLegend() {
+    final total = distribution.values.fold(0.0, (sum, item) => sum + item);
+    final sortedEntries = distribution.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final colors = _generateColors(sortedEntries.length);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(sortedEntries.length, (index) {
+        final entry = sortedEntries[index];
+        final percentage = (entry.value / total) * 100;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Row(
+            children: [
+              Container(width: 14, height: 14, color: colors[index]),
+              const SizedBox(width: 8),
+              // --- FIX: CHANGING LEGEND TEXT TO WHITE ---
+              Expanded(child: Text(entry.key, style: const TextStyle(fontSize: 13, color: Colors.white))),
+              Text(
+                '${percentage.toStringAsFixed(1)}%',
+                // Using a slightly transparent white for the percentage
+                style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.8)),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }
