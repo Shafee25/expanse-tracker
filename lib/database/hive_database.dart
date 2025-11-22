@@ -76,22 +76,21 @@ class HiveDatabase extends ChangeNotifier {
   // --- Chart Getters (for Analytics) ---
 
   // For Pie Chart
-  Map<String, double> get categoryExpenseDistribution {
-    Map<String, double> distribution = {};
+Map<String, double> get categoryExpenseDistribution {
+  Map<String, double> distribution = {
+    for (var c in categories) c: 0.0,
+  };
 
-    for (var category in categories) {
-      distribution[category] = 0.0;
+  for (var tx in _allTransactions) {
+    if (tx.type == 'expense') {
+      distribution[tx.category] =
+          distribution[tx.category]! + tx.amount;
     }
-
-    for (var tx in _allTransactions) {
-      if (tx.type == 'expense' && distribution.containsKey(tx.category)) {
-        distribution[tx.category] = distribution[tx.category]! + tx.amount;
-      }
-    }
-    // Remove categories with 0 expense
-    distribution.removeWhere((key, value) => value == 0.0);
-    return distribution;
   }
+
+  return distribution; // DO NOT remove zeros
+}
+
 
   // For Bar Chart (Simple: 12 bars for last 12 months)
   // Returns a map where key=month index (1=Jan, 2=Feb), value=total expense
