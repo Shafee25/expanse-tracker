@@ -51,7 +51,7 @@ class CategoryPieChart extends StatelessWidget {
 
   Widget _buildChart() {
     final total = distribution.values.fold(0.0, (sum, item) => sum + item);
-    final sortedEntries = distribution.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final sortedEntries = distribution.entries.toList();
     final colors = _generateColors(sortedEntries.length);
 
     return PieChart(
@@ -75,7 +75,7 @@ class CategoryPieChart extends StatelessWidget {
 
   Widget _buildLegend() {
     final total = distribution.values.fold(0.0, (sum, item) => sum + item);
-    final sortedEntries = distribution.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final sortedEntries = distribution.entries.toList();
     final colors = _generateColors(sortedEntries.length);
 
     return Column(
